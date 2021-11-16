@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from . import controller, models, schemas
@@ -42,7 +43,9 @@ def delete_member(player_id: int, db: Session = Depends(get_db)):
     member = controller.read_member(db=db, player_id=player_id)
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
-    return controller.delete_member(db=db, player_id=player_id)
+
+    controller.delete_member(db=db, player_id=player_id)
+    return JSONResponse(status_code=204, content={"message": "Member deleted"})
 
 @app.get("/teams/", response_model=List[schemas.Team])
 def read_teams(db: Session = Depends(get_db)):
